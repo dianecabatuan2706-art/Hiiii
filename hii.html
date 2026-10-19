@@ -1,0 +1,453 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Little Place for You 💗</title>
+
+<style>
+:root {
+  --pink: #d66b91;
+  --light: #fff0f5;
+  --dark: #663b50;
+  --border: #f0cbd9;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  color: var(--dark);
+  background: linear-gradient(135deg,#fff7fa,#ffe4ed);
+}
+main {
+  width: min(620px,94%);
+  margin: auto;
+  padding: 25px 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.progress { display: flex; gap: 6px; margin-bottom: 15px; }
+.progress span {
+  height: 5px; flex: 1; background: var(--border);
+  border-radius: 10px;
+}
+.progress span.done { background: var(--pink); }
+.page { display: none; animation: appear .3s ease; }
+.page.active { display: block; }
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 25px;
+  border-radius: 24px;
+  box-shadow: 0 12px 35px #a34d6810;
+}
+h1,h2 { font-family: Georgia,serif; font-weight: normal; }
+h1 { font-size: clamp(2.5rem,9vw,4rem); margin: 12px 0; }
+h2 { font-size: 1.6rem; }
+p { line-height: 1.8; }
+.eyebrow {
+  color: var(--pink); text-transform: uppercase;
+  letter-spacing: 3px; font-size: .75rem; font-weight: bold;
+}
+.center { text-align: center; }
+.heart { font-size: 2rem; margin: 12px; }
+button {
+  cursor: pointer; font: inherit; font-weight: bold;
+  border: 0; border-radius: 30px; padding: 13px 18px;
+}
+.primary { background: var(--pink); color: white; }
+.secondary { background: var(--light); color: var(--dark); }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.choice {
+  background: #fff8fb; border: 1px solid var(--border);
+  color: var(--dark); border-radius: 16px; text-align: left;
+}
+.response,.note {
+  background: var(--light); padding: 17px;
+  border-radius: 16px; margin-top: 15px; line-height: 1.8;
+}
+.hidden { display: none !important; }
+.nav { display: flex; gap: 12px; margin-top: 15px; }
+.nav button { flex: 1; }
+.nav button:disabled { opacity: .4; cursor: default; }
+.step { text-align: center; color: #a77c90; font-size: .85rem; }
+.day { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.day:last-child { border-bottom: 0; }
+@keyframes appear {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Virtual hug characters */
+.hug-scene {
+  position: relative; display: flex; align-items: center;
+  justify-content: center; overflow: hidden; min-height: 190px;
+  border-radius: 20px; margin: 18px 0;
+  background: radial-gradient(circle,#ffdce9,#fff2f7);
+}
+.buddy {
+  width: 90px; position: relative; z-index: 2;
+  display: flex; align-items: center; flex-direction: column;
+}
+.buddy.left { animation: moveLeft 1.3s ease-in-out infinite alternate; }
+.buddy.right { animation: moveRight 1.3s ease-in-out infinite alternate; }
+.face {
+  width: 70px; height: 68px; background: #ffd6ae;
+  border: 3px solid #ae7468; border-radius: 48%;
+  position: relative;
+}
+.ear {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #ffd6ae; border: 3px solid #ae7468;
+  position: absolute; top: -8px;
+}
+.ear.left { left: 0; }
+.ear.right { right: 0; }
+.eye {
+  width: 5px; height: 7px; border-radius: 50%;
+  background: #613d49; position: absolute; top: 29px;
+}
+.eye.left { left: 18px; }
+.eye.right { right: 18px; }
+.blush {
+  width: 12px; height: 7px; border-radius: 50%;
+  background: #f28da8; position: absolute; top: 42px;
+}
+.blush.left { left: 7px; }
+.blush.right { right: 7px; }
+.smile {
+  position: absolute; top: 38px; left: 29px;
+  width: 10px; height: 6px;
+  border-bottom: 2px solid #8b4c55; border-radius: 50%;
+}
+.body {
+  width: 65px; height: 44px; margin-top: -3px;
+  background: #e9a6c2; border: 3px solid #ae748b;
+  border-radius: 22px 22px 15px 15px; position: relative;
+}
+.arm {
+  position: absolute; top: 8px; width: 38px; height: 16px;
+  border-radius: 20px; background: #ffd6ae;
+  border: 3px solid #ae7468;
+}
+.left .arm { right: -20px; transform: rotate(-25deg); }
+.right .arm { left: -20px; transform: rotate(25deg); }
+.hug-heart {
+  position: absolute; z-index: 4; font-size: 27px;
+  animation: pulse .6s ease-in-out infinite alternate;
+}
+@keyframes moveLeft {
+  from { transform: translateX(10px) rotate(-2deg); }
+  to { transform: translateX(25px) rotate(3deg); }
+}
+@keyframes moveRight {
+  from { transform: translateX(-10px) rotate(2deg); }
+  to { transform: translateX(-25px) rotate(-3deg); }
+}
+@keyframes pulse {
+  from { transform: scale(.8); }
+  to { transform: scale(1.25); }
+}
+@media(max-width:450px) {
+  .choices { grid-template-columns: 1fr; }
+  .card { padding: 20px; }
+}
+</style>
+</head>
+
+<body>
+<main>
+  <div class="progress" id="progress"></div>
+
+  <!-- PAGE 1 -->
+  <section class="page active">
+    <div class="card center">
+      <div class="eyebrow">A tiny corner of the internet</div>
+      <div class="heart">♡ ✦ ♡</div>
+      <h1>A Little Place<br>for You 💗</h1>
+      <p>Hiii, pretty girl! 🥹💗</p>
+      <p>
+        May maliit akong ginawa para sa'yo kasi gusto kitang
+        lambingin kahit medyo busy ako these next few days.
+        HAHAHA. Ikaw ang main character dito. ♡
+      </p>
+      <p>
+        Alam mo yung may gusto kang kausapin kahit wala namang
+        importanteng sasabihin? Ganon ako sa'yo minsan.
+        Gusto lang kitang kulitin at tanungin ng “ano ginagawa mooo?”
+      </p>
+      <button class="primary" onclick="playOurSong()">▶ Play our song 🎧💗</button>
+      <p id="songStatus">May song akong pinili para sa'yo. ♡</p>
+    </div>
+  </section>
+
+  <!-- PAGE 2 -->
+  <section class="page">
+    <div class="card">
+      <div class="eyebrow">A little reassurance</div>
+      <h2>Konting reassurance lang, pretty girl 🫶</h2>
+      <p>
+        Alam kong hindi madali ang LDR, lalo na kung mas gusto mo
+        yung magkasama kayo in person. Gets ko naman kung bakit mahirap,
+        and I appreciate na tinatry mo pa rin. 🥹
+      </p>
+      <p>
+        These next few days, baka busy ako sa team building at
+        international exam, so possible na hindi ako makareply agad.
+        Pero please, huwag mong isipin na nagbago ang feelings ko
+        dahil lang busy ako, ha? Busy lang talaga, hindi kita iniiwasan. 💗
+      </p>
+      <p>
+        Hindi mo kailangang magpanggap na okay ka lang palagi.
+        Sabihin mo sa'kin kapag namimiss mo ako or kailangan mo ng
+        reassurance. Gusto kitang intindihin, hindi hulaan. ♡
+      </p>
+    </div>
+  </section>
+
+  <!-- PAGE 3 -->
+  <section class="page">
+    <div class="card">
+      <div class="eyebrow">Important research HAHAHA</div>
+      <h2>Pwede ba akong maging clingy? 😭💗</h2>
+      <p>Pili ka ng bet mo. Walang maling sagot, promise. ♡</p>
+
+      <div class="choices">
+        <button class="choice" onclick="choose('words')">🥺 Sabihin mong miss mo rin ako</button>
+        <button class="choice" onclick="choose('call')">📱 Call tayo pag free na</button>
+        <button class="choice" onclick="choose('texts')">💌 Random sweet messages</button>
+        <button class="choice" onclick="choose('space')">🫶 Clingy pero may space</button>
+      </div>
+      <div id="answer" class="response hidden"></div>
+      <p>Comfortable lang dapat tayo pareho, okay? No pressure. ♡</p>
+    </div>
+  </section>
+
+  <!-- PAGE 4 -->
+  <section class="page">
+    <div class="card">
+      <div class="eyebrow">One day at a time</div>
+      <h2>Habang medyo busy ako ☁️</h2>
+      <p>
+        Hindi ako nang-i-silent treatment, promise. May kailangan lang
+        akong tapusin at pag-focus-an. Eto ang little reminders natin. 💗
+      </p>
+      <div class="day">
+        <strong>Day 1 — Team building 🫡</strong>
+        <p>Baka busy ako, pero sana may mangyaring cute sa araw mo. ♡</p>
+      </div>
+      <div class="day">
+        <strong>Day 2 — Exam mode 📚</strong>
+        <p>Magfo-focus muna ako. Send ka naman ng good luck from afar?</p>
+      </div>
+      <div class="day">
+        <strong>Day 3 — Still rooting for us 🥹</strong>
+        <p>Pwede mo akong mamiss habang ine-enjoy mo rin ang araw mo.</p>
+      </div>
+      <div class="day">
+        <strong>Day 4 — Catch-up tayo? 💌</strong>
+        <p>Kapag free na tayo pareho, gusto kong marinig lahat ng kwento mo!</p>
+      </div>
+      <div class="note center">
+        <div class="eyebrow">Our little countdown</div>
+        <h2 id="countdown">4 days to go ♡</h2>
+        <p id="countdownText">One busy day at a time. 💗</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 5 -->
+  <section class="page">
+    <div class="card">
+      <div class="eyebrow">Just for you</div>
+      <h2>Last na 'to… siguro 😗💗</h2>
+      <p>
+        Gusto kita. Kaya nga gumawa ako ng website imbes na sabihin
+        lang na “miss na kita” HAHAHA. Gusto pa kitang makilala—
+        mga trip mo, little habits mo, at kung ano nagpapasaya sa'yo.
+      </p>
+      <p>
+        Hindi ko hinihinging maging okay agad sa lahat.
+        Gusto ko lang ipakita na gusto kitang kilalanin at maging
+        honest sa isa't isa. ♡
+      </p>
+
+      <div class="heart center">♡ · ♡ · ♡</div>
+
+      <h2>A secret letter, just for you 💌</h2>
+      <button class="primary" onclick="toggleLetter()">Open my secret letter ♡</button>
+      <div id="secretLetter" class="note hidden">
+        Hi, pretty girl. 🥹💗<br><br>
+        Pinili ko itong song para sa'yo kasi gusto kong may
+        mapapakinggan ka kapag busy ako at namimiss mo ako.
+        Hindi ko man kayang laging nandiyan agad, gusto kong
+        iparamdam na gusto pa rin kitang kilalanin, one day at a time.
+        <br><br>
+        Alam kong hindi laging madali ang LDR. Kapag namimiss mo ako,
+        sabihin mo lang. Kapag kailangan mo ng reassurance, sabihin
+        mo rin. Gusto kong matuto kung paano tayo magiging comfortable
+        at genuine sa isa't isa. Thank you for giving me a chance.
+        Miss na kita in advance. HAHAHA. 💗
+      </div>
+
+      <h2 style="margin-top:25px">Virtual hug delivery 🫂</h2>
+      <p>Tap mo kapag kailangan mo ng yakap kahit malayo tayo. 🤍</p>
+      <button class="secondary" onclick="sendHug()">Send me a virtual hug 🫂</button>
+      <div id="hugMessage" class="response hidden"></div>
+
+      <h2 style="margin-top:25px">A little song for you 🎧</h2>
+      <audio id="ourSong" controls preload="metadata" style="width:100%">
+        <source src="song.mp3" type="audio/mpeg">
+        Your browser does not support audio.
+      </audio>
+      <div class="heart center">Made with care, just for you ♡</div>
+    </div>
+  </section>
+
+  <div class="nav">
+    <button id="back" class="secondary" onclick="move(-1)" disabled>← Back</button>
+    <button id="next" class="primary" onclick="move(1)">Next →</button>
+  </div>
+  <p id="step" class="step">Page 1 of 5 · no pressure ♡</p>
+</main>
+
+<script>
+const pages = [...document.querySelectorAll('.page')];
+const progress = document.getElementById('progress');
+let current = 0;
+
+progress.innerHTML = pages.map(() => '<span></span>').join('');
+const bars = [...progress.children];
+
+function showPage(n) {
+  current = (n + pages.length) % pages.length;
+
+  pages.forEach((page, i) =>
+    page.classList.toggle('active', i === current)
+  );
+
+  bars.forEach((bar, i) =>
+    bar.classList.toggle('done', i <= current)
+  );
+
+  document.getElementById('back').disabled = current === 0;
+  document.getElementById('next').textContent =
+    current === pages.length - 1 ? 'Back to start ↺' : 'Next →';
+
+  document.getElementById('step').textContent =
+    `Page ${current + 1} of ${pages.length} · dahan-dahan lang, no pressure ♡`;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function move(direction) {
+  if (current === pages.length - 1 && direction === 1) {
+    showPage(0);
+  } else {
+    showPage(Math.max(0, Math.min(pages.length - 1, current + direction)));
+  }
+}
+
+function choose(answer) {
+  const replies = {
+    words: 'AYIEEEE noted po 😭💗 Kapag namiss kita, susubukan kong sabihin nang diretso para hindi ka manghula. Ikaw rin ha!',
+    call: 'Hala, “five minutes pa” incoming 😭📱 Pero kapag pareho lang tayong free. Quality time, no pressure. ♡',
+    texts: 'Ay delikado ka pala… baka makatanggap ka ng random “uy naalala kita dito” messages. HAHAHA 💌',
+    space: 'Clingy pero marunong rumespeto ng space. Gusto kitang maramdamang wanted ka, hindi pressured. 🫶'
+  };
+
+  const box = document.getElementById('answer');
+  box.textContent = replies[answer];
+  box.classList.remove('hidden');
+}
+
+function toggleLetter() {
+  document.getElementById('secretLetter').classList.toggle('hidden');
+}
+
+function sendHug() {
+  const box = document.getElementById('hugMessage');
+
+  box.innerHTML = `
+    <div class="hug-scene" role="img" aria-label="Two cute characters hugging">
+      <div class="buddy left">
+        <div class="face">
+          <i class="ear left"></i><i class="ear right"></i>
+          <i class="eye left"></i><i class="eye right"></i>
+          <i class="blush left"></i><i class="blush right"></i>
+          <i class="smile"></i>
+        </div>
+        <div class="body"><i class="arm"></i></div>
+      </div>
+      <div class="hug-heart">💗</div>
+      <div class="buddy right">
+        <div class="face">
+          <i class="ear left"></i><i class="ear right"></i>
+          <i class="eye left"></i><i class="eye right"></i>
+          <i class="blush left"></i><i class="blush right"></i>
+          <i class="smile"></i>
+        </div>
+        <div class="body"><i class="arm"></i></div>
+      </div>
+    </div>
+    <h3 class="center">Yakap na mahigpittt! 🫂💗</h3>
+    <p class="center">
+      Halika ritooo, virtual hug muna tayo.
+      Imagine na magkalapit tayo at nakayakap nang mahigpit.
+      Breathe in, breathe out. Sending you a little lambing
+      kahit malayo tayo. ♡
+    </p>
+  `;
+
+  box.classList.remove('hidden');
+}
+
+function playOurSong() {
+  showPage(4);
+  const player = document.getElementById('ourSong');
+  const status = document.getElementById('songStatus');
+
+  player.play().then(() => {
+    status.textContent = 'Playing our song… 🎧💗';
+  }).catch(() => {
+    status.textContent =
+      'Tap Play sa music player sa last page. Check kung nasa folder ang song.mp3. 🎧💗';
+  });
+}
+
+// Four-day countdown begins on first visit and stays consistent.
+let start = localStorage.getItem('littlePlaceStart');
+
+if (!start) {
+  start = Date.now();
+  localStorage.setItem('littlePlaceStart', start);
+} else {
+  start = Number(start);
+}
+
+function updateCountdown() {
+  const remaining = Math.max(0, 4 * 86400000 - (Date.now() - start));
+  const box = document.getElementById('countdown');
+  const text = document.getElementById('countdownText');
+
+  if (remaining === 0) {
+    box.textContent = "It's catch-up time! ♡";
+    text.textContent = 'Four days na! If free na tayo pareho, kwentuhan na tayo. 💗';
+    return;
+  }
+
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+
+  box.textContent = `${days}d ${hours}h ${minutes}m left ♡`;
+}
+
+updateCountdown();
+setInterval(updateCountdown, 60000);
+</script>
+</body>
+</html>
